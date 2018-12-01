@@ -27,8 +27,8 @@ public interface Promise<ThenArgumentType> {
 	 *         you SHOULD use your own synchronization.
 	 *     </li>
 	 * </ul>
-	 * @param cb
-	 * @return
+	 * @param cb callback to be executed after promise resolves
+	 * @return new promise that resolves with the value that this callback returns
 	 */
 	public <T> Promise<T> then(PromiseCallbackThen<ThenArgumentType, T> cb);
 	/**
@@ -53,8 +53,8 @@ public interface Promise<ThenArgumentType> {
      *  });
      * }
      * </pre>
-	 * @param cb
-	 * @return
+	 * @param cb callback to be executed after promise resolves
+	 * @return new promise that resolves with the value that this callback returns
 	 */
 	public default <T> Promise<T> thenAsync(PromiseCallbackThen<ThenArgumentType, Promise<T>> cb) {
 		final Promise<Promise<T>> nestedPromise = then(cb);
@@ -64,8 +64,9 @@ public interface Promise<ThenArgumentType> {
 	/**
 	 * Convenience method for callbacks that return Void.
 	 * For complete documentation see {@link Promise#then}.
-	 * @param cb
-	 * @return
+	 * @param cb callback to be executed after promise resolves
+	 * @return new promise that resolves with the value that this
+     *         callback returns or a value that was returned by a parent promise if there was no exception
 	 */
 	public default Promise<Void> then(PromiseCallbackThen.VoidReturn<ThenArgumentType> cb) {
 		return then((PromiseCallbackThen<ThenArgumentType, Void>)cb);
@@ -73,7 +74,7 @@ public interface Promise<ThenArgumentType> {
 	
 	/**
 	 * Catch handlers must return the same value as the promise above them would.
-	 * @param catchHandler
+	 * @param catchHandler callback to be executed if the promise rejects
 	 * @return
 	 */
     public Promise<ThenArgumentType> catchException(PromiseCallbackCatch<ThenArgumentType> catchHandler);
