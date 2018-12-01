@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import io.github.darker.promise.multi.MultiResult;
 
-class MultiResults {
+class TestMultiResults {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
