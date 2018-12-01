@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.darker.promise</groupId>
   <artifactId>promise</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2.1-SNAPSHOT</version>
   <name>Promise</name>
   <description>Type aware promise library with the same syntax as JavaScript ES6 promises.</description>
   <url>http://github.com/Darker/promise/tree/master</url>
@@ -59,7 +59,7 @@
           <execution>
             <id>attach-sources</id>
             <goals>
-              <goal>jar-no-fork</goal>
+              <goal>jar</goal>
             </goals>
           </execution>
         </executions>
@@ -103,6 +103,20 @@
         </configuration>
       </plugin>
     </plugins>
+    
+    <!-- Sources for GWT -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.java</include>
+          <include>**/*.gwt.xml</include>
+        </includes>
+      </resource>
+    </resources>
   </build>
   <dependencies>
   	<dependency>
