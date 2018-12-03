@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.darker.promise</groupId>
   <artifactId>promise</artifactId>
-  <version>1.0.2.1-SNAPSHOT</version>
+  <version>1.0.2.1</version>
   <name>Promise</name>
   <description>Type aware promise library with the same syntax as JavaScript ES6 promises.</description>
   <url>http://github.com/Darker/promise/tree/master</url>
