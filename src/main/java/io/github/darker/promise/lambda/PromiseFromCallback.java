@@ -5,7 +5,7 @@ import io.github.darker.promise.PromiseChaining;
  * This is the most typical Promise type. It will resolve or reject based on what your callback does.
  * 
  * Remember that callback of this promise is called in the same thread as the constructor.
- * @author mareda
+ * @author Jakub Mareda
  *
  * @param <ThenArgumentType>
  */

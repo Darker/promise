@@ -1,4 +1,4 @@
-package io.github.darker.promise.synchronous;
+package io.github.darker.promise.concurrent;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;

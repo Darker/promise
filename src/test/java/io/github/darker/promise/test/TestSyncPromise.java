@@ -1,6 +1,6 @@
 package io.github.darker.promise.test;
 
-import static io.github.darker.promise.synchronous.SynchronousPromise.resolvePromiseSync;
+import static io.github.darker.promise.concurrent.SynchronousPromise.resolvePromiseSync;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.concurrent.ExecutionException;
@@ -16,7 +16,8 @@ import org.junit.jupiter.api.function.Executable;
 
 import io.github.darker.promise.Promise;
 import io.github.darker.promise.lambda.PromiseFromCallback;
-import io.github.darker.promise.test.util.TestException;
+import io.github.darker.promise.test.util.RuntimeTestException;
+import io.github.darker.promise.value.PromiseFromValue;
 
 class TestSyncPromise {
     public static <T extends Throwable> Executable unwrapException(Executable throwingCode) {
@@ -70,15 +71,15 @@ class TestSyncPromise {
 	@DisplayName("Test if exceptions pop out of promises at the end")
 	void testResolveWithException() {
 		Promise<String> test = new PromiseFromCallback<>((resolver)->{
-			resolver.reject(new TestException());
+			resolver.reject(new RuntimeTestException());
 		});
-		assertThrows(TestException.class, ()->{resolveOrUnwrapException(test);});
+		assertThrows(RuntimeTestException.class, ()->{resolveOrUnwrapException(test);});
 	}
 	@Test
 	@DisplayName("Test if exceptions jump over nested promises")
 	void testResolveWithExceptionNested() {
 		Promise<String> test = new PromiseFromCallback<>((resolver)->{
-			resolver.reject(new TestException());
+			resolver.reject(new RuntimeTestException());
 		});
 		Promise<?> test2 = test.thenAsync((unused)->{
 			return (new PromiseFromCallback<String>((resolver)->{
@@ -89,7 +90,7 @@ class TestSyncPromise {
 			});
 		});
 		
-		assertThrows(TestException.class, ()->{resolveOrUnwrapException(test2);});
+		assertThrows(RuntimeTestException.class, ()->{resolveOrUnwrapException(test2);});
 	}
 	@Test
 	@DisplayName("Test if inner exceptions can be caught in the inner branch")
@@ -99,7 +100,7 @@ class TestSyncPromise {
 		}))
 		.thenAsync((messagePrefix)->{
 			return (new PromiseFromCallback<String>((resolver)->{
-				resolver.reject(new TestException(messagePrefix+"B"));
+				resolver.reject(new RuntimeTestException(messagePrefix+"B"));
 			}))
 			.catchException((Throwable e)->{
 				return e.getMessage()+"C";
@@ -116,7 +117,7 @@ class TestSyncPromise {
 		}))
 		.thenAsync((messagePrefix)->{
 			return (new PromiseFromCallback<String>((resolver)->{
-				resolver.reject(new TestException(messagePrefix+"B"));
+				resolver.reject(new RuntimeTestException(messagePrefix+"B"));
 			}));
 		})			
 		.catchException((Throwable e)->{
@@ -133,11 +134,11 @@ class TestSyncPromise {
 		}))
 		.thenAsync((messagePrefix)->{
 			return (new PromiseFromCallback<String>((resolver)->{
-				resolver.reject(new TestException(messagePrefix+"B"));
+				resolver.reject(new RuntimeTestException(messagePrefix+"B"));
 			}));
 		});			
 
-		assertThrows(TestException.class, ()->{resolveOrUnwrapException(test);});
+		assertThrows(RuntimeTestException.class, ()->{resolveOrUnwrapException(test);});
 	}
 	
 	@Test
@@ -165,10 +166,10 @@ class TestSyncPromise {
 			resolver.resolve("A");
 		}));
 		Promise<String> testB = (new PromiseFromCallback<>((resolver)->{
-			resolver.reject(new TestException("REJECT"));
+			resolver.reject(new RuntimeTestException("REJECT"));
 		}));
 
-		assertThrows(TestException.class, ()->{resolveOrUnwrapException(Promise.all(testA,testB));});
+		assertThrows(RuntimeTestException.class, ()->{resolveOrUnwrapException(Promise.all(testA,testB));});
 	}
 	
 	@Test
@@ -203,6 +204,30 @@ class TestSyncPromise {
 						)
 				);
 	}
-	
-	
+	@Test
+	@DisplayName("Test const value promises")
+	void testconstvalpromise() throws Throwable {
+		Promise<String> testA = new PromiseFromValue<>("A");
+		Promise<Integer> testB = new PromiseFromValue<>(1);
+
+		assertEquals("A1", 
+				resolveOrUnwrapException(
+						   Promise.multi(testA, testB).then((str, integer)->{return str+integer;})
+						)
+				);
+	}
+	@Test
+	@DisplayName("Test const value promise chaining")
+	void testconstvalpromisechain() throws Throwable {
+		Promise<String> abc = new PromiseFromValue<>("A")
+				.then((letter)->{return letter+"B";})
+				.then((letter)->{return letter+"C";})
+				;
+
+		assertEquals("ABC", 
+				resolveOrUnwrapException(
+						   abc
+						)
+				);
+	}
 }

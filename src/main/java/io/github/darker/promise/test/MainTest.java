@@ -1,47 +1,49 @@
 package io.github.darker.promise.test;
 
-import java.util.Date;
-
-import io.github.darker.promise.Promise;
-import io.github.darker.promise.lambda.PromiseFromCallback;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainTest {
-
+	public static final Pattern REGEX_MATCH_ID_FROM_FILE = Pattern.compile(".*?([\\\\\\/]|^)([0-9]+)\\.[a-zA-Z0-9]+$");
 	public static final boolean TRUE_VALUE = true;
 	public static void main(String[] args) {
+		printMatches(REGEX_MATCH_ID_FROM_FILE, "666.ddd");
+		printMatches(REGEX_MATCH_ID_FROM_FILE, "asa/dsad/666.ddd");
+		printMatches(REGEX_MATCH_ID_FROM_FILE, "1111\\1111\\666.ddd");
+		printMatches(REGEX_MATCH_ID_FROM_FILE, "ss666.png");
+		//System.out.println(escapeRegexSymbols("${VAL}"));
 		
-		Promise<String> test = new PromiseFromCallback<>((resolver)->{
-			resolver.resolve("test");
-		});
-		test.then((result)->{
-			System.out.println("Result 1: "+result);
-			return 5;
-		})
-        .then((result2)->{
-        	System.out.println("Result 2: "+result2);
-        })
-        .then((result3)->{
-        	if(TRUE_VALUE) {
-				throw new RuntimeException("Test exception");
-			} else {
-				return false;
-			}
-        })
-        .catchException((e)->{
-        	System.out.println("Exception message: "+e.getMessage());
-        })
-        .thenAsync((unused)->{
-        	return new PromiseFromCallback<Date>((resolver)->{
-        		resolver.resolve(new Date());
-        	});
-        	
-        })
-        .then((resultDate)->{
-        	System.out.println("Nested promise should return date: "+resultDate);
-        })
-        .then((result4)->{
-        	System.out.println("Done");
-        });
+		//System.out.println("${VAL}".replaceAll(escapeRegexSymbols("${VAL}"),"1"));
 	}
+	public static final void printMatches(Pattern regex, String input) {
+		final Matcher m = regex.matcher(input);
+		System.out.println("Matching: "+input);
+		if(m==null || !m.matches()) {
+			System.out.println("  - No match");
+		}
+		else {
+			for(int i=0;i<=m.groupCount(); ++i) {
+				System.out.println("  ("+i+"): "+m.group(i));
+			}
+		}
+	}
+    public static String escapeRegexSymbols(String notARegex) {
+    	if(notARegex==null || notARegex.length()==0) {
+    		return "";
+    	}
+    	return notARegex
+    			.replaceAll("\\\\", "\\\\")
+    			.replaceAll("\\[", "\\\\[")
+    			.replaceAll("\\]", "\\\\]")
+    			.replaceAll("\\(", "\\\\(")
+    			.replaceAll("\\)", "\\\\)")
+    			.replaceAll("\\.", "\\\\.")
+    			.replaceAll("\\?", "\\\\?")
+    			.replaceAll("\\+", "\\\\+")
+    			.replaceAll("\\{", "\\\\{")
+    			.replaceAll("\\}", "\\\\}")
+    			.replaceAll("\\$", "\\\\\\$")
+    			;
+    }
 
 }
